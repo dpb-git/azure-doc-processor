@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Document Processor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .upload-area {
+            border: 2px dashed #ccc;
+            padding: 40px;
+            text-align: center;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        button {
+            background: #0078d4;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #005a9e;
+        }
+        #status {
+            margin-top: 20px;
+            padding: 12px;
+            border-radius: 4px;
+            display: none;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <h1>Document Processor</h1>
+    <p>Upload a PDF to extract text using Azure AI</p>
+    
+    <div class="upload-area">
+        <input type="file" id="fileInput" accept=".pdf" />
+        <br><br>
+        <button onclick="uploadFile()">Upload Document</button>
+    </div>
+    
+    <div id="status"></div>
+
+    <script>
+        const STORAGE_ACCOUNT = 'docprocproject';
+    const CONTAINER = 'uploads';
+    const SAS_TOKEN = 'se=2026-02-24T23%3A59%3A59Z&sp=acw&sv=2026-02-06&sr=c&sig=mAFbURfTmlOddtStz1nR%2BX9PRIdZjKlyRpjuOSQP9Ss%3D';
+    
+    async function uploadFile() {
+        const fileInput = document.getElementById('fileInput');
+        const file = fileInput.files[0];
+        
+        if (!file) {
+            showStatus('Please select a file', 'error');
+            return;
+        }
+        
+        showStatus('Uploading...', 'success');
+        
+        const blobUrl = `https://${STORAGE_ACCOUNT}.blob.core.windows.net/${CONTAINER}/${file.name}?${SAS_TOKEN}`;
+        
+        try {
+            const response = await fetch(blobUrl, {
+                method: 'PUT',
+                headers: {
+                    'x-ms-blob-type': 'BlockBlob'
+                },
+                body: file
+            });
+            
+            if (response.ok) {
+                showStatus('Upload successful! Your document is being processed.', 'success');
+                fileInput.value = '';
+            } else {
+                showStatus('Upload failed. Please try again.', 'error');
+            }
+        } catch (error) {
+            showStatus('Upload failed: ' + error.message, 'error');
+        }
+    }
+    
+    function showStatus(message, type) {
+        const statusDiv = document.getElementById('status');
+        statusDiv.textContent = message;
+        statusDiv.className = type;
+        statusDiv.style.display = 'block';
+    }
+    </script>
+</body>
+</html>
