@@ -1,3 +1,7 @@
+## Live Demo
+
+Upload a PDF at https://polite-flower-01b23d00f.2.azurestaticapps.net stored in Cosmos DB with extracted text.
+
 # Azure Document Processor
 
 A cloud-based document processing pipeline built on Microsoft Azure. Users upload a PDF through a web interface and the system automatically extracts all text using AI, then stores it in a database for querying.
