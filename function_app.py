@@ -1,3 +1,4 @@
+# Azure Document Processor Function
 import azure.functions as func
 import logging
 import os
